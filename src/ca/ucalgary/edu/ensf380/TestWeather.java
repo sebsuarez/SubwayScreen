@@ -1,14 +1,25 @@
 package ca.ucalgary.edu.ensf380;
 
-import ca.ucalgary.edu.ensf380.api_test.WeatherInstance;
-import ca.ucalgary.edu.ensf380.api_test.WeatherService;
+import java.io.IOException;
+import java.util.List;
 
 public class TestWeather {
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		WeatherInstance currentWeather = WeatherService.getCurrentWeather();
-		System.out.println("Test");
-		double temp = currentWeather.getTemperature();
-		System.out.println(temp);
+
+	public static void main(String[] args) throws IOException {
+	    WeatherInstance currentWeather = WeatherService.getCurrentWeather();
+	    double temp = currentWeather.getTemperature();
+	    System.out.println(temp);
+	    List<NewsItem> news = NewsService.getNews("Calgary");
+
+	    if (news.isEmpty()) {
+	        System.out.println("No news available.");
+	    } else {
+	        for (NewsItem newsItem : news) {
+	            System.out.println("Title: " + newsItem.getTitle());
+	            System.out.println("Source: " + newsItem.getSourceName());
+	            System.out.println();
+	        }
+	    }
 	}
+
 }
