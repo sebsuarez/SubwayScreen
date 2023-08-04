@@ -15,23 +15,24 @@ public class SubwayScreen {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
 
+        String cityCode = (String)args[0];
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(SubwayScreen::updateData, 0, 15, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(() -> updateData(args[1], cityCode), 0, 15, TimeUnit.SECONDS);
 
         ScheduledExecutorService newsScheduler = Executors.newScheduledThreadPool(1);
         newsScheduler.scheduleAtFixedRate(SubwayScreen::updateNews, 0, 7500, TimeUnit.MILLISECONDS);
     }
 
-    private static void updateData() {
+    private static void updateData(String keyword, String cityCode) {
         try {
-            news = NewsService.getNews("Canada");
+            news = NewsService.getNews(keyword);
         } catch (Exception e) {
             e.printStackTrace();
             news = null;
         }
 
         try {
-            currentWeather = WeatherService.getCurrentWeather("5913490");
+            currentWeather = WeatherService.getCurrentWeather(cityCode);
         } catch (Exception e) {
             e.printStackTrace();
             currentWeather = null;
