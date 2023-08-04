@@ -1,4 +1,5 @@
 package ca.ucalgary.edu.ensf380;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -17,19 +18,20 @@ public class SubwayScreen {
 
         String cityCode = (String)args[0];
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(() -> updateData(args[1], cityCode), 0, 15, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(() -> updateData(cityCode), 0, 15, TimeUnit.SECONDS);
+        
+        try {
+            news = NewsService.getNews(args[1]);
+        } catch (Exception e) {
+            e.printStackTrace();
+            news = null;
+        }
 
         ScheduledExecutorService newsScheduler = Executors.newScheduledThreadPool(1);
         newsScheduler.scheduleAtFixedRate(SubwayScreen::updateNews, 0, 7500, TimeUnit.MILLISECONDS);
     }
 
-    private static void updateData(String keyword, String cityCode) {
-        try {
-            news = NewsService.getNews(keyword);
-        } catch (Exception e) {
-            e.printStackTrace();
-            news = null;
-        }
+    private static void updateData(String cityCode) {
 
         try {
             currentWeather = WeatherService.getCurrentWeather(cityCode);
