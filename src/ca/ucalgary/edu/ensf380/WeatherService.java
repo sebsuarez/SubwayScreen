@@ -11,10 +11,10 @@ public abstract class WeatherService {
     public WeatherService() {
     }
 
-    public static WeatherInstance getCurrentWeather() {
+    public static WeatherInstance getCurrentWeather(String cityCode) {
         WeatherInstance currentWeather = new WeatherInstance();
         String apiKey = "7919cef0282916061e569b2bbca43b3f";
-        String cityCode = "5913490";
+        //String cityCode = "5913490";
 
         try {
             String url = "https://api.openweathermap.org/data/2.5/weather?id=" + cityCode + "&appid=" + apiKey + "&units=metric";
