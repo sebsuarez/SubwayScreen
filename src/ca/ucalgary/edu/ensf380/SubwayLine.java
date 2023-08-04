@@ -1,6 +1,5 @@
 package ca.ucalgary.edu.ensf380;
 
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,13 +46,14 @@ public class SubwayLine {
 	}
 
 	public TrainStation getStationByCode(String stationCode) {
-        TrainStation matchingTrainStation = null;
-        for (TrainStation station : stations) {
-            if (station.getStationCode() == stationCode) {
-                matchingTrainStation = station;
-                break;
-            }
-        }
-		return matchingTrainStation;
+	    TrainStation matchingTrainStation = null;
+	    for (TrainStation station : stations) {
+	        if (station.getStationCode().equals(stationCode)) {
+	            matchingTrainStation = station;
+	            break;
+	        }
+	    }
+	    return matchingTrainStation;
 	}
 }
+	
