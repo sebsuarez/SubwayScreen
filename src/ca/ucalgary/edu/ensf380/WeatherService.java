@@ -7,14 +7,25 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Provides methods to fetch current weather data using the OpenWeatherMap API.
+ */
 public abstract class WeatherService {
+    /**
+     * Constructs a WeatherService object.
+     */
     public WeatherService() {
     }
 
+    /**
+     * Retrieves the current weather for the specified city using its city code.
+     *
+     * @param cityCode The city code for the desired city's weather.
+     * @return A WeatherInstance object containing the current weather data.
+     */
     public static WeatherInstance getCurrentWeather(String cityCode) {
         WeatherInstance currentWeather = new WeatherInstance();
         String apiKey = "7919cef0282916061e569b2bbca43b3f";
-        //String cityCode = "5913490";
 
         try {
             String url = "https://api.openweathermap.org/data/2.5/weather?id=" + cityCode + "&appid=" + apiKey + "&units=metric";

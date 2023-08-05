@@ -10,10 +10,19 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Provides methods to fetch and parse news data from an external API.
+ */
 public abstract class NewsService {
     private static final String API_KEY = "b7358c163a22492e9d29f85397807fde";
 
-
+    /**
+     * Retrieves a list of news items based on the provided keyword.
+     *
+     * @param keyword The keyword to search for news.
+     * @return A list of news items.
+     * @throws IOException If there's an error while fetching news data.
+     */
     public static List<NewsItem> getNews(String keyword) throws IOException {
         List<NewsItem> newsList = new ArrayList<>();
 

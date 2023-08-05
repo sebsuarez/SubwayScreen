@@ -7,31 +7,45 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Represents a graphical user interface for displaying subway information.
+ */
 public class SubwayScreen {
     private static List<NewsItem> news;
     private static WeatherInstance currentWeather;
     private static List<Train> trains;
     private static Train selectedTrain;
+    private static int currentNewsIndex = 0;
 
+    /**
+     * The main entry point of the program.
+     *
+     * @param args Command-line arguments containing city code and keyword.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> createAndShowGUI());
 
         String cityCode = (String)args[0];
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(() -> updateData(cityCode), 0, 15, TimeUnit.SECONDS);
-        
-        try {
-            news = NewsService.getNews(args[1]);
-        } catch (Exception e) {
-            e.printStackTrace();
-            news = null;
-        }
+        scheduler.scheduleAtFixedRate(() -> updateData(args[1], cityCode), 0, 15, TimeUnit.SECONDS);
 
         ScheduledExecutorService newsScheduler = Executors.newScheduledThreadPool(1);
         newsScheduler.scheduleAtFixedRate(SubwayScreen::updateNews, 0, 7500, TimeUnit.MILLISECONDS);
     }
 
-    private static void updateData(String cityCode) {
+    /**
+     * Updates the data including news, weather, and subway information.
+     *
+     * @param keyword  Keyword for news retrieval.
+     * @param cityCode City code for weather retrieval.
+     */
+    private static void updateData(String keyword, String cityCode) {
+        try {
+            news = NewsService.getNews(keyword);
+        } catch (Exception e) {
+            e.printStackTrace();
+            news = null;
+        }
 
         try {
             currentWeather = WeatherService.getCurrentWeather(cityCode);
@@ -53,56 +67,75 @@ public class SubwayScreen {
         selectedTrain = matchingTrain;
     }
 
+    /**
+     * Updates the currently displayed news.
+     */
     private static void updateNews() {
         if (news != null && news.size() > 1) {
-            NewsItem firstNewsItem = news.remove(0);
-            news.add(firstNewsItem);
+            currentNewsIndex = (currentNewsIndex + 1) % news.size();
         }
     }
 
+    /**
+     * Creates and displays the graphical user interface.
+     */
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Subway Screen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
         JPanel contentPane = new JPanel();
-        contentPane.setLayout(new GridLayout(3, 1));
+        contentPane.setLayout(new GridLayout(4, 1));
 
-        JPanel topPanel = new JPanel(new GridLayout(1, 2));
-        JLabel blankLabel = new JLabel(" ");
-        topPanel.add(blankLabel);
-
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE);
         JLabel dateTimeWeatherLabel = new JLabel("Date, Time, and Weather", SwingConstants.RIGHT);
-        topPanel.add(dateTimeWeatherLabel);
+        dateTimeWeatherLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        topPanel.add(dateTimeWeatherLabel, BorderLayout.CENTER);
         contentPane.add(topPanel);
 
-        JTextArea newsTextArea = new JTextArea(10, 40);
-        contentPane.add(new JScrollPane(newsTextArea));
+        JPanel blankPanel = new JPanel();
+        blankPanel.setBackground(Color.LIGHT_GRAY);
+        contentPane.add(blankPanel);
 
-        JPanel trainInfoPanel = new JPanel();
-        trainInfoPanel.setLayout(new BoxLayout(trainInfoPanel, BoxLayout.Y_AXIS));
+        JPanel newsPanel = new JPanel(new BorderLayout());
+        newsPanel.setBackground(Color.WHITE);
+        JTextArea newsTextArea = new JTextArea(4, 40);
+        newsTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        newsPanel.add(new JScrollPane(newsTextArea), BorderLayout.CENTER);
+        contentPane.add(newsPanel);
+
+        JPanel trainInfoPanel = new JPanel(new BorderLayout());
+        trainInfoPanel.setBackground(Color.WHITE);
+        JTextArea trainInfoTextArea = new JTextArea(2, 40);
+        trainInfoTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        trainInfoPanel.add(new JScrollPane(trainInfoTextArea), BorderLayout.CENTER);
         contentPane.add(trainInfoPanel);
 
         frame.setContentPane(contentPane);
         frame.setVisible(true);
 
         ScheduledExecutorService guiUpdater = Executors.newScheduledThreadPool(1);
-        guiUpdater.scheduleAtFixedRate(() -> updateGUI(dateTimeWeatherLabel, newsTextArea, trainInfoPanel), 0, 1, TimeUnit.SECONDS);
+        guiUpdater.scheduleAtFixedRate(() -> updateGUI(dateTimeWeatherLabel, newsTextArea, trainInfoTextArea), 0, 1, TimeUnit.SECONDS);
     }
 
-    private static void updateGUI(JLabel dateTimeWeatherLabel, JTextArea newsTextArea, JPanel trainInfoPanel) {
+    /**
+     * Updates the GUI components with the latest data.
+     *
+     * @param dateTimeWeatherLabel Label for date, time, and weather.
+     * @param newsTextArea         TextArea for news display.
+     * @param trainInfoTextArea    TextArea for train information display.
+     */
+    private static void updateGUI(JLabel dateTimeWeatherLabel, JTextArea newsTextArea, JTextArea trainInfoTextArea) {
         if (currentWeather != null) {
             String weatherText = "Temperature: " + currentWeather.getTemperature() + " °C, Date and Time: " + currentWeather.getFormattedDateTime();
             dateTimeWeatherLabel.setText(weatherText);
         }
 
         if (news != null) {
-            StringBuilder newsText = new StringBuilder();
-            for (NewsItem newsItem : news) {
-                newsText.append("Title: ").append(newsItem.getTitle()).append("\n");
-                newsText.append("Source: ").append(newsItem.getSourceName()).append("\n\n");
-            }
-            newsTextArea.setText(newsText.toString());
+            NewsItem currentNewsItem = news.get(currentNewsIndex);
+            String newsText = "Title: " + currentNewsItem.getTitle() + "\nSource: " + currentNewsItem.getSourceName();
+            newsTextArea.setText(newsText);
         }
 
         if (trains != null && selectedTrain != null) {
@@ -110,11 +143,10 @@ public class SubwayScreen {
             TrainStation currentStation = selectedTrain.getCurrentStation();
             int currentIndex = selectedTrain.getCurrentLine().getStations().indexOf(currentStation);
 
-            trainInfoText.append("Past Station: ");
             if (currentIndex > 0) {
-                trainInfoText.append(selectedTrain.getCurrentLine().getStations().get(currentIndex - 1).getStationName()).append("\n");
+                trainInfoText.append("Past Station: ").append(selectedTrain.getCurrentLine().getStations().get(currentIndex - 1).getStationName()).append("\n");
             } else {
-                trainInfoText.append("N/A\n");
+                trainInfoText.append("Past Station: N/A\n");
             }
 
             trainInfoText.append("Current Station: ").append(currentStation.getStationName()).append("\n");
@@ -124,11 +156,8 @@ public class SubwayScreen {
                 trainInfoText.append(selectedTrain.getCurrentLine().getStations().get(i).getStationName()).append("\n");
             }
 
-            trainInfoPanel.removeAll();
-            JLabel trainInfoLabel = new JLabel(trainInfoText.toString());
-            trainInfoPanel.add(trainInfoLabel);
-            trainInfoPanel.revalidate();
-            trainInfoPanel.repaint();
+            trainInfoTextArea.setText(trainInfoText.toString());
         }
     }
 }
+

@@ -3,43 +3,68 @@ package ca.ucalgary.edu.ensf380;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.nio.file.*;
 
+/**
+ * Represents the subway system with lines, stations, and trains.
+ */
 public class SubwaySystem {
     private static SubwayLine redLine;
     private static SubwayLine blueLine;
     private static SubwayLine greenLine;
     private static List<Train> trains = new ArrayList<>();
 
+    /**
+     * Returns the red subway line.
+     *
+     * @return The red subway line.
+     */
     public static SubwayLine getRedLine() {
         return redLine;
     }
 
+    /**
+     * Returns the blue subway line.
+     *
+     * @return The blue subway line.
+     */
     public static SubwayLine getBlueLine() {
         return blueLine;
     }
 
+    /**
+     * Returns the green subway line.
+     *
+     * @return The green subway line.
+     */
     public static SubwayLine getGreenLine() {
         return greenLine;
     }
 
+    /**
+     * Returns the list of trains in the subway system.
+     *
+     * @return The list of trains.
+     */
     public static List<Train> getTrains() {
         return trains;
     }
 
-    public static void main(String[] args) {
-        getSubwaySystem();
-    }
-
+    /**
+     * Initializes the subway system with stations, lines, and trains.
+     */
     public static void getSubwaySystem() {
         List<TrainStation> stations = new ArrayList<>();
         List<SubwayLine> lines = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\charl\\eclipse-workspace\\SubwayScreen\\data\\subway.csv"))) {
-        	String line;
+            String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
@@ -90,6 +115,12 @@ public class SubwaySystem {
         updateTrainsFromCSV(folderPath, trains);
     }
 
+    /**
+     * Updates train information from CSV files.
+     *
+     * @param csvFilePath Path to the folder containing CSV files.
+     * @param trains List of trains to update.
+     */
     private static void updateTrainsFromCSV(String csvFilePath, List<Train> trains) {
         try {
             Path folder = Paths.get(csvFilePath);
@@ -112,7 +143,7 @@ public class SubwaySystem {
             
             if (mostRecentCSV != null) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(mostRecentCSV.toFile()))) {
-                	String line;
+                    String line;
                     reader.readLine();
                     int lineNumber = 1;
                     while ((line = reader.readLine()) != null) {
@@ -159,7 +190,6 @@ public class SubwaySystem {
             e.printStackTrace();
         }
     }
-
-
 }
+
   
