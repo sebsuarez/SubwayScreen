@@ -12,12 +12,6 @@ import java.util.regex.Pattern;
  */
 public abstract class WeatherService {
     /**
-     * Constructs a WeatherService object.
-     */
-    public WeatherService() {
-    }
-
-    /**
      * Retrieves the current weather for the specified city using its city code.
      *
      * @param cityCode The city code for the desired city's weather.

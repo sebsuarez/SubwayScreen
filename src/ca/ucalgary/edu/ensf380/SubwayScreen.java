@@ -77,7 +77,7 @@ public class SubwayScreen {
     }
 
     /**
-     * Creates and displays the graphical user interface.
+     * Creates and shows the graphical user interface (GUI) for the subway screen.
      */
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Subway Screen");
@@ -85,39 +85,58 @@ public class SubwayScreen {
         frame.setSize(800, 600);
 
         JPanel contentPane = new JPanel();
-        contentPane.setLayout(new GridLayout(4, 1));
+        contentPane.setLayout(new BorderLayout());
 
+        // Creating the top panel for map and weather
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
+
+        // Creating the left panel for the map area (empty for now)
+        JPanel mapPanel = new JPanel();
+        mapPanel.setBackground(Color.GRAY);
+        mapPanel.setPreferredSize(new Dimension((int)(frame.getWidth() * 0.7), frame.getHeight()));
+        topPanel.add(mapPanel, BorderLayout.WEST);
+
+        // Creating the right panel for the weather
+        JPanel weatherPanel = new JPanel(new BorderLayout());
+        weatherPanel.setBackground(Color.WHITE);
         JLabel dateTimeWeatherLabel = new JLabel("Date, Time, and Weather", SwingConstants.RIGHT);
         dateTimeWeatherLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        topPanel.add(dateTimeWeatherLabel, BorderLayout.CENTER);
-        contentPane.add(topPanel);
+        weatherPanel.add(dateTimeWeatherLabel, BorderLayout.CENTER);
+        weatherPanel.setPreferredSize(new Dimension((int)(frame.getWidth() * 0.3), frame.getHeight()));
+        topPanel.add(weatherPanel, BorderLayout.CENTER);
 
-        JPanel blankPanel = new JPanel();
-        blankPanel.setBackground(Color.LIGHT_GRAY);
-        contentPane.add(blankPanel);
+        contentPane.add(topPanel, BorderLayout.NORTH);
 
+        // Creating the bottom panel for news and train stations
+        JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
+
+        // Creating the news panel
         JPanel newsPanel = new JPanel(new BorderLayout());
-        newsPanel.setBackground(Color.WHITE);
+        newsPanel.setBackground(Color.LIGHT_GRAY);
         JTextArea newsTextArea = new JTextArea(4, 40);
         newsTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
         newsPanel.add(new JScrollPane(newsTextArea), BorderLayout.CENTER);
-        contentPane.add(newsPanel);
+        bottomPanel.add(newsPanel);
 
-        JPanel trainInfoPanel = new JPanel(new BorderLayout());
-        trainInfoPanel.setBackground(Color.WHITE);
-        JTextArea trainInfoTextArea = new JTextArea(2, 40);
-        trainInfoTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
-        trainInfoPanel.add(new JScrollPane(trainInfoTextArea), BorderLayout.CENTER);
-        contentPane.add(trainInfoPanel);
+        // Creating the train stations panel
+        JPanel trainStationsPanel = new JPanel(new BorderLayout());
+        trainStationsPanel.setBackground(Color.WHITE);
+        JTextArea trainStationsTextArea = new JTextArea(2, 40);
+        trainStationsTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
+        trainStationsPanel.add(new JScrollPane(trainStationsTextArea), BorderLayout.CENTER);
+        bottomPanel.add(trainStationsPanel);
+
+        contentPane.add(bottomPanel, BorderLayout.SOUTH); // Placing it at the bottom
 
         frame.setContentPane(contentPane);
         frame.setVisible(true);
 
         ScheduledExecutorService guiUpdater = Executors.newScheduledThreadPool(1);
-        guiUpdater.scheduleAtFixedRate(() -> updateGUI(dateTimeWeatherLabel, newsTextArea, trainInfoTextArea), 0, 1, TimeUnit.SECONDS);
+        guiUpdater.scheduleAtFixedRate(() -> updateGUI(dateTimeWeatherLabel, newsTextArea, trainStationsTextArea), 0, 1, TimeUnit.SECONDS);
     }
+
+
+
 
     /**
      * Updates the GUI components with the latest data.
@@ -128,7 +147,13 @@ public class SubwayScreen {
      */
     private static void updateGUI(JLabel dateTimeWeatherLabel, JTextArea newsTextArea, JTextArea trainInfoTextArea) {
         if (currentWeather != null) {
-            String weatherText = "Temperature: " + currentWeather.getTemperature() + " °C, Date and Time: " + currentWeather.getFormattedDateTime();
+            String weatherText = "<html>" +
+                    "Temperature: " + currentWeather.getTemperature() + " °C<br>" +
+                    "Date and Time: " + currentWeather.getFormattedDateTime() + "<br>" +
+                    "Conditions: " + currentWeather.getWeatherCondition() + "<br>" +
+                    "Wind Speed: " + String.format("%.2f", currentWeather.getWindSpeed()) + " km/h<br>" +
+                    "Humidity: " + currentWeather.getHumidity() + "%" +
+                    "</html>";
             dateTimeWeatherLabel.setText(weatherText);
         }
 
@@ -144,20 +169,29 @@ public class SubwayScreen {
             int currentIndex = selectedTrain.getCurrentLine().getStations().indexOf(currentStation);
 
             if (currentIndex > 0) {
-                trainInfoText.append("Past Station: ").append(selectedTrain.getCurrentLine().getStations().get(currentIndex - 1).getStationName()).append("\n");
+                trainInfoText.append(selectedTrain.getCurrentLine().getStations().get(currentIndex - 1).getStationName());
             } else {
                 trainInfoText.append("Past Station: N/A\n");
             }
+            
+            trainInfoText.append("➔ ");
 
-            trainInfoText.append("Current Station: ").append(currentStation.getStationName()).append("\n");
+            // Bold formatting for the current station
+            String currStat = currentStation.getStationName();
+            currStat = currStat.toUpperCase();
+            trainInfoText.append(currStat);
 
-            trainInfoText.append("Next Stations:\n");
+            // Arrow symbol for indicating direction
+            trainInfoText.append("➔ ");
+
+            // Display the next stations
             for (int i = currentIndex + 1; i < currentIndex + 4 && i < selectedTrain.getCurrentLine().getStations().size(); i++) {
-                trainInfoText.append(selectedTrain.getCurrentLine().getStations().get(i).getStationName()).append("\n");
+                trainInfoText.append(selectedTrain.getCurrentLine().getStations().get(i).getStationName()).append(" ");
             }
 
             trainInfoTextArea.setText(trainInfoText.toString());
         }
     }
+
 }
 
