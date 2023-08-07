@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"ca.ucalgary.edu.ensf380","l":"WeatherInstance"}];updateSearchResults();
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"ca.ucalgary.edu.ensf380","l":"TrainStation"}];updateSearchResults();
