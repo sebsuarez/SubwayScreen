@@ -1,7 +1,11 @@
 package ca.ucalgary.edu.ensf380;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -90,8 +94,16 @@ public class SubwayScreen {
         JPanel topPanel = new JPanel(new BorderLayout());
 
         JPanel mapPanel = new JPanel();
-        mapPanel.setBackground(Color.GRAY);
-        mapPanel.setPreferredSize(new Dimension((int)(frame.getWidth() * 0.7), frame.getHeight()));
+        mapPanel.setBackground(Color.WHITE);
+
+        BufferedImage trainSystem = null;
+		try {
+			trainSystem = ImageIO.read(new File("C:\\Users\\charl\\eclipse-workspace\\SubwayScreen\\src\\ca\\ucalgary\\edu\\ensf380\\Trains.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        JLabel picLabel = new JLabel(new ImageIcon(trainSystem));
+        mapPanel.add(picLabel);
         topPanel.add(mapPanel, BorderLayout.WEST);
 
         JPanel weatherPanel = new JPanel(new BorderLayout());
@@ -170,12 +182,10 @@ public class SubwayScreen {
             
             trainInfoText.append("➔ ");
 
-            // Bold formatting for the current station
             String currStat = currentStation.getStationName();
             currStat = currStat.toUpperCase();
             trainInfoText.append(currStat);
 
-            // Arrow symbol for indicating direction
             trainInfoText.append("➔ ");
 
             // Display the next stations
