@@ -104,7 +104,7 @@ public class SubwayScreen {
 
         BufferedImage trainSystem = null;
 		try {
-			trainSystem = ImageIO.read(new File("C:\\Users\\charl\\eclipse-workspace\\SubwayScreen\\src\\ca\\ucalgary\\edu\\ensf380\\Trains.png"));
+			trainSystem = ImageIO.read(new File("src\\ca\\ucalgary\\edu\\ensf380\\Trains.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

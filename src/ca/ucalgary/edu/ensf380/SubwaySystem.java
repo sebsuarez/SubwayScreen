@@ -63,7 +63,7 @@ public class SubwaySystem {
         List<TrainStation> stations = new ArrayList<>();
         List<SubwayLine> lines = new ArrayList<>();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\charl\\eclipse-workspace\\SubwayScreen\\data\\subway.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("data\\subway.csv"))) {
             String line;
             reader.readLine();
             while ((line = reader.readLine()) != null) {
@@ -111,7 +111,7 @@ public class SubwaySystem {
         lines.add(blueLine);
         lines.add(greenLine);
 
-        String folderPath = "C:\\Users\\charl\\eclipse-workspace\\SubwayScreen\\out";
+        String folderPath = "out";
         updateTrainsFromCSV(folderPath, trains);
     }
 
