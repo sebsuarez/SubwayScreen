@@ -87,16 +87,13 @@ public class SubwayScreen {
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
 
-        // Creating the top panel for map and weather
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        // Creating the left panel for the map area (empty for now)
         JPanel mapPanel = new JPanel();
         mapPanel.setBackground(Color.GRAY);
         mapPanel.setPreferredSize(new Dimension((int)(frame.getWidth() * 0.7), frame.getHeight()));
         topPanel.add(mapPanel, BorderLayout.WEST);
 
-        // Creating the right panel for the weather
         JPanel weatherPanel = new JPanel(new BorderLayout());
         weatherPanel.setBackground(Color.WHITE);
         JLabel dateTimeWeatherLabel = new JLabel("Date, Time, and Weather", SwingConstants.RIGHT);
@@ -107,10 +104,8 @@ public class SubwayScreen {
 
         contentPane.add(topPanel, BorderLayout.NORTH);
 
-        // Creating the bottom panel for news and train stations
         JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
 
-        // Creating the news panel
         JPanel newsPanel = new JPanel(new BorderLayout());
         newsPanel.setBackground(Color.LIGHT_GRAY);
         JTextArea newsTextArea = new JTextArea(4, 40);
@@ -118,7 +113,6 @@ public class SubwayScreen {
         newsPanel.add(new JScrollPane(newsTextArea), BorderLayout.CENTER);
         bottomPanel.add(newsPanel);
 
-        // Creating the train stations panel
         JPanel trainStationsPanel = new JPanel(new BorderLayout());
         trainStationsPanel.setBackground(Color.WHITE);
         JTextArea trainStationsTextArea = new JTextArea(2, 40);
