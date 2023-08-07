@@ -7,9 +7,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+
 
 /**
  * Represents a graphical user interface for displaying subway information.
@@ -27,11 +30,14 @@ public class SubwayScreen {
      * @param args Command-line arguments containing city code and keyword.
      */
     public static void main(String[] args) {
+    	
+    	startSimulator(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+    	
         SwingUtilities.invokeLater(() -> createAndShowGUI());
 
-        String cityCode = (String)args[0];
+        String cityCode = (String)args[7];
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(() -> updateData(args[1], cityCode), 0, 15, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(() -> updateData(args[8], cityCode, args[9]), 0, 15, TimeUnit.SECONDS);
 
         ScheduledExecutorService newsScheduler = Executors.newScheduledThreadPool(1);
         newsScheduler.scheduleAtFixedRate(SubwayScreen::updateNews, 0, 7500, TimeUnit.MILLISECONDS);
@@ -43,7 +49,7 @@ public class SubwayScreen {
      * @param keyword  Keyword for news retrieval.
      * @param cityCode City code for weather retrieval.
      */
-    private static void updateData(String keyword, String cityCode) {
+    private static void updateData(String keyword, String cityCode, String trainNum) {
         try {
             news = NewsService.getNews(keyword);
         } catch (Exception e) {
@@ -63,7 +69,7 @@ public class SubwayScreen {
 
         Train matchingTrain = null;
         for (Train train : trains) {
-            if (train.getTrainNumber().equals("T6")) {
+            if (train.getTrainNumber().equals(trainNum)) {
                 matchingTrain = train;
                 break;
             }
@@ -109,7 +115,7 @@ public class SubwayScreen {
         JPanel weatherPanel = new JPanel(new BorderLayout());
         weatherPanel.setBackground(Color.WHITE);
         JLabel dateTimeWeatherLabel = new JLabel("Date, Time, and Weather", SwingConstants.RIGHT);
-        dateTimeWeatherLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        dateTimeWeatherLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         weatherPanel.add(dateTimeWeatherLabel, BorderLayout.CENTER);
         weatherPanel.setPreferredSize(new Dimension((int)(frame.getWidth() * 0.3), frame.getHeight()));
         topPanel.add(weatherPanel, BorderLayout.CENTER);
@@ -119,7 +125,7 @@ public class SubwayScreen {
         JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
 
         JPanel newsPanel = new JPanel(new BorderLayout());
-        newsPanel.setBackground(Color.LIGHT_GRAY);
+        newsPanel.setBackground(Color.WHITE);
         JTextArea newsTextArea = new JTextArea(4, 40);
         newsTextArea.setFont(new Font("Helvetica", Font.PLAIN, 14));
         newsPanel.add(new JScrollPane(newsTextArea), BorderLayout.CENTER);
@@ -132,7 +138,7 @@ public class SubwayScreen {
         trainStationsPanel.add(new JScrollPane(trainStationsTextArea), BorderLayout.CENTER);
         bottomPanel.add(trainStationsPanel);
 
-        contentPane.add(bottomPanel, BorderLayout.SOUTH); // Placing it at the bottom
+        contentPane.add(bottomPanel, BorderLayout.SOUTH);
 
         frame.setContentPane(contentPane);
         frame.setVisible(true);
@@ -196,6 +202,40 @@ public class SubwayScreen {
             trainInfoTextArea.setText(trainInfoText.toString());
         }
     }
+    
+    
+    /**
+     * Starts the subway simulator process and manages its lifecycle.
+     * The simulator process is terminated either when the program exits
+     * or after a specified time duration.
+     */
+    private static void startSimulator(String arg0, String arg1, String arg2, String arg3, String arg4, String arg5, String arg6) {
+        Process process = null;
+        try {
+            String[] command = {arg0, arg1, arg2, arg3, arg4, arg5, arg6};
+            process = new ProcessBuilder(command).start();
+        } catch (IOException e) {
+            System.err.println(e);
+            e.printStackTrace();
+        }
 
+        final Process finalProcess = process;
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (finalProcess != null) {
+                finalProcess.destroy();
+            }
+        }));
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (finalProcess != null) {
+                    finalProcess.destroy();
+                }
+                timer.cancel();
+            }
+        }, 5 * 60 * 1000);
+    }
 }
 
